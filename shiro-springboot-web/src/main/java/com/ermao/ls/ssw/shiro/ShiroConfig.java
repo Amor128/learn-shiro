@@ -1,6 +1,7 @@
 package com.ermao.ls.ssw.shiro;
 
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
@@ -18,12 +19,6 @@ public class ShiroConfig {
 
     @Bean
     public Realm realm() {
-        MyRealm myRealm = new MyRealm();
-        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
-        matcher.setHashAlgorithmName("MD5");
-        matcher.setHashIterations(3);
-        myRealm.setCredentialsMatcher(matcher);
-        myRealm.setCachingEnabled(true);
-        return myRealm;
+        return new MyRealm();
     }
 }

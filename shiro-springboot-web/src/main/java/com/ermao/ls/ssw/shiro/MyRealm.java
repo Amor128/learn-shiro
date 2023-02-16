@@ -1,8 +1,10 @@
 package com.ermao.ls.ssw.shiro;
 
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -19,6 +21,16 @@ import java.util.Set;
  * Date: 2023/2/8 23:38
  */
 public class MyRealm extends AuthorizingRealm {
+    private static final int HASH_ITERATIONS = 3;
+
+    public MyRealm() {
+        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
+        matcher.setHashAlgorithmName(Sha256Hash.ALGORITHM_NAME);
+        matcher.setHashIterations(HASH_ITERATIONS);
+        setCredentialsMatcher(matcher);
+        setCachingEnabled(true);
+    }
+
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         Object username = principalCollection.getPrimaryPrincipal();
@@ -29,10 +41,10 @@ public class MyRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        UsernamePasswordToken usernamePasswordToken = ((UsernamePasswordToken)authenticationToken);
-
+        UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken)authenticationToken;
         String username = usernamePasswordToken.getUsername();
         Map<String, Object> userInfo = getUserInfo(username);
+
         if (CollectionUtils.isEmpty(userInfo)) {
             throw new UnknownAccountException();
         }
